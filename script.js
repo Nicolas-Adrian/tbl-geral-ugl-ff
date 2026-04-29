@@ -27,12 +27,14 @@ const scoreboardRows = document.getElementById("scoreboardRows");
 const statsContainer = document.getElementById("teamEditorTable");
 const logoManager = document.getElementById("logoManager");
 const resetButton = document.getElementById("resetButton");
+const adminRoot = document.getElementById("adminRoot");
 const tabButtons = Array.from(document.querySelectorAll(".tab-button"));
 const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 
 let currentState = buildDefaultState();
 let syncIntervalId = null;
 let lastKnownUpdatedAt = currentState.updatedAt;
+const draftValues = new Map();
 
 function slugify(value) {
   return value
@@ -398,13 +400,44 @@ function cloneState() {
   return JSON.parse(JSON.stringify(currentState));
 }
 
+function getDraftKey(teamId, field) {
+  return teamId + "::" + field;
+}
+
+function getDraftValue(teamId, field, fallback) {
+  const key = getDraftKey(teamId, field);
+  return draftValues.has(key) ? draftValues.get(key) : fallback;
+}
+
+function setDraftValue(teamId, field, value) {
+  draftValues.set(getDraftKey(teamId, field), value);
+}
+
+function clearDraftValue(teamId, field) {
+  draftValues.delete(getDraftKey(teamId, field));
+}
+
+function isEditingAdminField() {
+  const activeElement = document.activeElement;
+  return Boolean(
+    adminRoot &&
+      activeElement &&
+      adminRoot.contains(activeElement) &&
+      activeElement.matches("input, textarea, select")
+  );
+}
+
 async function updateTeam(teamIndex, field, value) {
   const nextState = cloneState();
   const numericFields = ["points", "matches", "booyahs", "kills"];
+  const teamId = nextState.teams[teamIndex] ? nextState.teams[teamIndex].id : "";
   nextState.teams[teamIndex][field] = numericFields.includes(field) ? Number(value) || 0 : value;
 
   try {
     currentState = await saveState(nextState);
+    if (teamId) {
+      clearDraftValue(teamId, field);
+    }
     renderAdmin();
     renderOverlay(currentState);
   } catch (error) {
@@ -437,8 +470,9 @@ function renderStatsTab() {
     const nameField = document.createElement("label");
     const nameInput = document.createElement("input");
     nameInput.type = "text";
-    nameInput.value = team.name;
+    nameInput.value = getDraftValue(team.id, "name", team.name);
     nameInput.dataset.teamIndex = String(index);
+    nameInput.dataset.teamId = team.id;
     nameInput.dataset.field = "name";
     nameField.appendChild(nameInput);
 
@@ -457,8 +491,9 @@ function renderStatsTab() {
       const input = document.createElement("input");
       input.type = "number";
       input.min = "0";
-      input.value = String(metric.value);
+      input.value = String(getDraftValue(team.id, metric.field, metric.value));
       input.dataset.teamIndex = String(index);
+      input.dataset.teamId = team.id;
       input.dataset.field = metric.field;
       wrapper.appendChild(input);
       row.appendChild(wrapper);
@@ -468,6 +503,12 @@ function renderStatsTab() {
   });
 
   statsContainer.querySelectorAll("input").forEach(function (input) {
+    input.addEventListener("input", function (event) {
+      const teamId = event.target.dataset.teamId;
+      const field = event.target.dataset.field;
+      setDraftValue(teamId, field, event.target.value);
+    });
+
     input.addEventListener("change", function (event) {
       const teamIndex = Number(event.target.dataset.teamIndex);
       const field = event.target.dataset.field;
@@ -540,8 +581,9 @@ function renderLogosTab() {
     urlText.textContent = "Link da imagem";
     const urlInput = document.createElement("input");
     urlInput.type = "url";
-    urlInput.value = team.logoUrl;
+    urlInput.value = getDraftValue(team.id, "logoUrl", team.logoUrl);
     urlInput.dataset.teamIndex = String(index);
+    urlInput.dataset.teamId = team.id;
     urlInput.dataset.role = "logo-url";
     urlField.append(urlText, urlInput);
 
@@ -562,6 +604,11 @@ function renderLogosTab() {
   });
 
   logoManager.querySelectorAll('[data-role="logo-url"]').forEach(function (input) {
+    input.addEventListener("input", function (event) {
+      const teamId = event.target.dataset.teamId;
+      setDraftValue(teamId, "logoUrl", event.target.value);
+    });
+
     input.addEventListener("change", function (event) {
       const teamIndex = Number(event.target.dataset.teamIndex);
       updateTeam(teamIndex, "logoUrl", event.target.value.trim());
@@ -639,7 +686,9 @@ async function initializeApp() {
     currentState = normalizeState(nextState);
     lastKnownUpdatedAt = currentState.updatedAt;
     renderOverlay(currentState);
-    renderAdmin();
+    if (!isEditingAdminField()) {
+      renderAdmin();
+    }
   });
 }
 
