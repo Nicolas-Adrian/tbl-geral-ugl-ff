@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overlay Tabela Geral</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="overlayRoot" class="overlay-shell">
+      <section class="overlay-hero">
+        <div class="event-badge">
+          <span class="event-icon" aria-hidden="true">&#8594;</span>
+          <span class="event-copy">
+            <strong>UGL</strong>
+            <strong>2026</strong>
+          </span>
+        </div>
+
+        <div class="brand-lockup">
+          <svg class="brand-mark" viewBox="0 0 140 140" aria-hidden="true">
+            <path
+              d="M24 78 42 26l28 33 30-33 16 52-46-20Zm14-10 32-14 34 14-7-25-27 29-25-29Z"
+              fill="currentColor"
+            />
+            <path
+              d="M20 100c0-12 9-21 21-21h8c12 0 21 9 21 21v14H20Zm57 0c0-12 9-21 21-21h7c12 0 21 9 21 21v14H77Z"
+              fill="currentColor"
+            />
+          </svg>
+          <div class="brand-text">UGL</div>
+        </div>
+
+        <div class="title-block">
+          <span class="title-eyebrow">TABELA</span>
+          <h1>GERAL</h1>
+        </div>
+      </section>
+
+      <section class="scoreboard-panel">
+        <div class="board-labels" aria-hidden="true">
+          <span class="spacer"></span>
+          <span class="spacer"></span>
+          <span class="spacer"></span>
+          <span>PONTOS</span>
+          <span>QUEDAS</span>
+          <span>BOOYAH</span>
+          <span>KILLS</span>
+        </div>
+        <div id="scoreboardRows" class="scoreboard-rows"></div>
+      </section>
+    </main>
+
+    <main id="adminRoot" class="admin-shell">
+      <section class="admin-sidebar">
+        <header class="admin-header">
+          <div>
+            <p class="admin-kicker">Arquivo unico para OBS</p>
+            <h1>Painel da Tabela Geral</h1>
+            <p class="admin-subtitle">
+              Atualize nomes, logos, kills, buias, quedas e pontos ao vivo.
+            </p>
+            <div class="single-file-note">
+              <span>Admin:</span>
+              <a class="mode-link" href="?view=admin">index.html?view=admin</a>
+              <span>Overlay:</span>
+              <a class="mode-link" href="?view=overlay">index.html?view=overlay</a>
+            </div>
+          </div>
+          <div class="admin-actions">
+            <button id="resetButton" class="ghost-button" type="button">
+              Restaurar exemplo
+            </button>
+          </div>
+        </header>
+
+        <nav class="tab-bar" aria-label="Abas do painel">
+          <button class="tab-button is-active" data-tab-target="statsTab" type="button">
+            Pontuacao
+          </button>
+          <button class="tab-button" data-tab-target="logosTab" type="button">
+            Logos
+          </button>
+        </nav>
+
+        <section id="statsTab" class="tab-panel is-active">
+          <div class="panel-intro">
+            <h2>Editar pontuação</h2>
+            <p>
+              O overlay sempre reorganiza automaticamente do 1º ao 12º lugar pelo total
+              de pontos.
+            </p>
+          </div>
+          <div id="teamEditorTable" class="team-editor-table"></div>
+        </section>
+
+        <section id="logosTab" class="tab-panel">
+          <div class="panel-intro">
+            <h2>Editar logos</h2>
+            <p>
+              Voce pode usar link direto de imagem ou enviar um arquivo do seu PC para
+              cada time.
+            </p>
+          </div>
+          <div id="logoManager" class="logo-manager"></div>
+        </section>
+      </section>
+
+      <aside class="preview-sidebar">
+        <div class="preview-header">
+          <div>
+            <p class="admin-kicker">Previa ao vivo</p>
+            <h2>Overlay</h2>
+          </div>
+          <a class="preview-link" href="?view=overlay" target="_blank" rel="noreferrer">
+            Abrir overlay
+          </a>
+        </div>
+        <iframe
+          class="preview-frame"
+          title="Previa do overlay"
+          src="?view=overlay"
+        ></iframe>
+      </aside>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
