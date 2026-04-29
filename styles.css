@@ -123,7 +123,8 @@ body::after {
 
 .brand-mark {
   width: 6.9rem;
-  color: #ffffff;
+  display: block;
+  object-fit: contain;
 }
 
 .brand-text {
@@ -279,9 +280,15 @@ body::after {
   background:
     radial-gradient(circle, rgba(152, 103, 255, 0.34) 0%, rgba(152, 103, 255, 0.1) 42%, transparent 72%);
   filter: blur(10px);
-  opacity: 0.26;
-  animation: leading-lightning-pulse 2.2s ease-in-out infinite;
+  opacity: 0.22;
   pointer-events: none;
+}
+
+.score-row.is-leading .logo-cell img {
+  position: relative;
+  z-index: 1;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .team-name-cell {
@@ -381,18 +388,6 @@ body::after {
   }
 }
 
-@keyframes leading-lightning-pulse {
-  0%,
-  100% {
-    opacity: 0.12;
-    transform: scale(0.94);
-  }
-
-  50% {
-    opacity: 0.22;
-    transform: scale(1.06);
-  }
-}
 
 .stat-points {
   color: var(--lime);
